@@ -1,10 +1,12 @@
 const express = require("express");
+const cors = require("cors");
 
 const Data = require("./data/db.js");
 
 const server = express();
 
 server.use(express.json());
+server.use(cors());
 
 //C-R-U-D
 
