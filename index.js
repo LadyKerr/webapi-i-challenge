@@ -40,16 +40,16 @@ server.get("/api/users/:id", (req, res) => {
     });
 });
 
-//Create
+//Create - require name & bio;
 server.post("/api/users", (req, res) => {
-  const userData = req.body;
+  const newUser = req.body;
 
-  Data.insert(userData)
+  Data.insert(newUser)
     .then(user => {
-      if (user) {
-        res.status(201).json(user);
+      if (newUser.name && newUser.bio) {
+        return res.status(201).json(user);
       } else {
-        res
+        return res
           .status(400)
           .json({ errorMessage: "Please Provide name and bio for user" });
       }
@@ -66,21 +66,48 @@ server.delete("/api/users/:id", (req, res) => {
   Data.remove(id)
     .then(deleted => {
       if (deleted) {
-        res.status(204).end();
+        return res.status(200).json(deleted);
       } else {
-        res
-          .status(404)
-          .json({ message: "The user with the specified ID does not exist." });
+        return res.status(404).json({
+          errorMessage: "The user with the specified ID does not exist."
+        });
       }
     })
     .catch(err => {
-      res.status(500).json({ err: "The user could not be removed" });
+      res
+        .status(500)
+        .json({ error: err, message: "The user could not be removed" });
     });
 });
 
-// //Update
-// server.put("/", (req, res) => {});
+//Update - require bio & name; check for ID
+server.put("/api/users/:id", (req, res) => {
+  const id = req.params.id;
+  const changes = req.body;
+  const { name, bio } = req.body;
 
+  Data.update(id, changes)
+    .then(updated => {
+      if (!updated) {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist." });
+      } else if (!name || !bio) {
+        res
+          .status(400)
+          .json({ message: "Please provide name and bio for the user." });
+      } else {
+        res.status(200).json(updated);
+      }
+    })
+    .catch(error => {
+      res
+        .status(500)
+        .json({ message: "The user information could not be modified." });
+    });
+});
+
+//server listening
 const port = 5000;
 server.listen(port, () =>
   console.log(`\n*** server is listening on port ${port} *** \n`)
