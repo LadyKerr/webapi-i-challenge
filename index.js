@@ -8,7 +8,7 @@ server.use(express.json());
 
 //C-R-U-D
 
-//Read - show the list of users
+//Read - show the array of users
 server.get("/api/users", (req, res) => {
   Data.find()
     .then(user => {
@@ -21,5 +21,26 @@ server.get("/api/users", (req, res) => {
     });
 });
 
+//display users by their ID
+server.get("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  Data.findById(id)
+    .then(user => {
+      if (user) {
+        res.status(204).end();
+      } else {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+});
+
 const port = 5000;
-server.listen(port, () => console.log(`\n*** running on port ${port} *** \n`));
+server.listen(port, () =>
+  console.log(`\n*** server is listening on port ${port} *** \n`)
+);
