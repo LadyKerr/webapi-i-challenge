@@ -38,7 +38,9 @@ server.get("/api/users/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json(err);
+      res
+        .status(500)
+        .json({ error: "The user information could not be retrieved." });
     });
 });
 
@@ -49,9 +51,9 @@ server.post("/api/users", (req, res) => {
   Data.insert(newUser)
     .then(user => {
       if (newUser.name && newUser.bio) {
-        return res.status(201).json(user);
+        res.status(201).json(user);
       } else {
-        return res
+        res
           .status(400)
           .json({ errorMessage: "Please Provide name and bio for user" });
       }
@@ -68,9 +70,9 @@ server.delete("/api/users/:id", (req, res) => {
   Data.remove(id)
     .then(deleted => {
       if (deleted) {
-        return res.status(200).json(deleted);
+        res.status(200).json(deleted);
       } else {
-        return res.status(404).json({
+        res.status(404).json({
           errorMessage: "The user with the specified ID does not exist."
         });
       }
